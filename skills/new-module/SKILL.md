@@ -38,7 +38,7 @@ Before writing, state in a few lines and wait if anything is unclear:
 7. **Register** in `src/router/index.js`.
 8. **Docs** — `api/<name>.md` and a row in `api/README.md` if the project keeps API docs (see `api-docs`). If it uses Swagger/OpenAPI instead, update that.
 
-Reference implementations: `../create-backend/templates/mongodb/examples/` and `../create-backend/templates/postgres/examples/` (a complete `vendor` module at final paths). For an AI feature, model it on `../create-backend/templates/ai/src/modules/assistant/` (`prompt/`, `tools/`, `evals/`).
+Reference implementations: `../create-backend/templates/mongodb-example.md` and `../create-backend/templates/postgres-example.md` — a complete `vendor` module, each file under a `## \`<path>\`` heading. For an AI feature, model it on `src/modules/assistant/` in `../create-backend/templates/ai.md` (`prompt/`, `tools/`, `evals/`).
 
 ## 4. Verify
 

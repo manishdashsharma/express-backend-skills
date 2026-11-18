@@ -1,3 +1,272 @@
+# PostgreSQL files
+
+Add these for a PostgreSQL (Prisma 7) project, on top of `common.md`. Make `docker-entrypoint.sh` executable (`chmod +x`).
+
+Files in this bundle: 8.
+
+## `Dockerfile`
+
+```dockerfile
+FROM node:22-alpine AS deps
+WORKDIR /app
+RUN apk add --no-cache python3 make g++
+COPY package.json package-lock.json prisma.config.js ./
+COPY prisma ./prisma
+RUN npm ci --omit=dev --ignore-scripts && npx prisma generate
+
+FROM node:22-alpine AS runtime
+WORKDIR /app
+ENV NODE_ENV=production
+RUN apk add --no-cache tini && addgroup -S app && adduser -S app -G app
+COPY --from=deps /app/node_modules ./node_modules
+COPY package.json prisma.config.js ./
+COPY prisma ./prisma
+COPY src ./src
+COPY docker-entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh && chown -R app:app /app
+USER app
+EXPOSE 5000
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||5000)+'/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
+CMD ["node", "src/server.js"]
+```
+
+## `docker-compose.yml`
+
+```yaml
+services:
+  postgres:
+    image: postgres:17-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
+    ports:
+      - '5432:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER:-app} -d $${POSTGRES_DB:-app}']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ['redis-server', '--appendonly', 'yes']
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ['CMD', 'redis-cli', 'ping']
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres-data:
+  redis-data:
+```
+
+## `docker-entrypoint.sh`
+
+```sh
+#!/bin/sh
+set -e
+
+if [ "${RUN_MIGRATIONS:-true}" = "true" ]; then
+  ./node_modules/.bin/prisma migrate deploy
+fi
+
+exec "$@"
+```
+
+## `package.json`
+
+```json
+{
+  "name": "__PACKAGE_NAME__",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "main": "src/server.js",
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "lint": "eslint src",
+    "lint:fix": "eslint src --fix",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:migrate:deploy": "prisma migrate deploy",
+    "postinstall": "prisma generate"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "bcrypt": "^6.0.0",
+    "compression": "^1.8.1",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
+    "dotenv": "^17.4.2",
+    "express": "^5.2.1",
+    "express-rate-limit": "^8.6.2",
+    "helmet": "^8.3.0",
+    "ioredis": "^6.0.0",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.23.0",
+    "winston": "^3.19.0",
+    "zod": "^4.4.3"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "eslint": "^10.9.1",
+    "prisma": "^7.10.0"
+  }
+}
+```
+
+## `prisma.config.js`
+
+```js
+import 'dotenv/config';
+import { defineConfig } from 'prisma/config';
+
+export default defineConfig({
+  schema: 'prisma/schema.prisma',
+  migrations: {
+    path: 'prisma/migrations',
+  },
+  datasource: {
+    url: process.env.DATABASE_URL,
+  },
+});
+```
+
+## `prisma/schema.prisma`
+
+```prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum UserRole {
+  OWNER
+  MANAGER
+  STAFF
+}
+
+model User {
+  id           String    @id @default(cuid())
+  name         String    @db.VarChar(100)
+  email        String    @unique @db.VarChar(254)
+  passwordHash String
+  role         UserRole  @default(OWNER)
+  lastLoginAt  DateTime?
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  sessions Session[]
+
+  @@index([email, isActive])
+  @@map("users")
+}
+
+model Session {
+  id                String    @id
+  userId            String
+  tokenHash         String
+  previousTokenHash String?
+  userAgent         String?   @db.VarChar(300)
+  ip                String?   @db.VarChar(64)
+  expiresAt         DateTime
+  revokedAt         DateTime?
+  refreshedAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+
+  @@index([userId, revokedAt])
+  @@index([expiresAt])
+  @@map("sessions")
+}
+```
+
+## `src/config/databases.js`
+
+```js
+import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import config from './index.js';
+import logger from '../shared/utils/logger.js';
+
+let writeClient;
+let readClient;
+
+const createClient = (connectionString) => new PrismaClient({
+  adapter: new PrismaPg({ connectionString, max: config.database.poolMax }),
+  log: config.env === 'development' ? ['warn', 'error'] : ['error'],
+});
+
+const getWriteDB = () => {
+  if (!writeClient) {
+    writeClient = createClient(config.database.url);
+  }
+  return writeClient;
+};
+
+const getReadDB = () => {
+  if (!config.database.readUrl) {
+    return getWriteDB();
+  }
+  if (!readClient) {
+    readClient = createClient(config.database.readUrl);
+  }
+  return readClient;
+};
+
+const connectDatabases = async () => {
+  await getWriteDB().$connect();
+  logger.info('PostgreSQL write connected');
+  if (getReadDB() !== getWriteDB()) {
+    await getReadDB().$connect();
+    logger.info('PostgreSQL read connected');
+  }
+};
+
+const checkDatabaseHealth = async () => {
+  const startedAt = Date.now();
+  try {
+    await getWriteDB().$queryRaw`SELECT 1`;
+    return { connected: true, latencyMs: Date.now() - startedAt };
+  } catch (error) {
+    return { connected: false, latencyMs: null, error: error.message };
+  }
+};
+
+const disconnectDatabases = async () => {
+  await Promise.all([writeClient?.$disconnect(), readClient?.$disconnect()]);
+  logger.info('PostgreSQL disconnected');
+};
+
+export { getWriteDB, getReadDB, connectDatabases, checkDatabaseHealth, disconnectDatabases };
+```
+
+## `src/modules/auth/services/auth.service.js`
+
+```js
 import bcrypt from 'bcrypt';
 import { randomUUID } from 'crypto';
 import config from '../../../config/index.js';
@@ -219,3 +488,4 @@ export {
   getMeService,
   listSessionsService,
 };
+```

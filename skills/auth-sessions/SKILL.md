@@ -5,7 +5,7 @@ description: Secure authentication for Express APIs — short-lived access JWT i
 
 # Auth & Sessions
 
-A complete, tested implementation ships in `../create-backend/templates/`: `common/src/modules/auth/` (controller, routes, validations), `mongodb/src/modules/auth/services/auth.service.js` + `mongodb/src/models/{user,session}.model.js`, and `postgres/src/modules/auth/services/auth.service.js` + `postgres/prisma/schema.prisma`. Copy those; the rules below explain them.
+A complete, tested implementation ships in the `create-backend` skill's Markdown bundles: `../create-backend/templates/common.md` (`src/modules/auth/` controller, routes, validations, token utils, middleware), `../create-backend/templates/mongodb.md` (`auth.service.js`, `user.model.js`, `session.model.js`) and `../create-backend/templates/postgres.md` (`auth.service.js`, `prisma/schema.prisma`). Write those files; the rules below explain them.
 
 ## Model
 

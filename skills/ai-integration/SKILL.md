@@ -5,7 +5,7 @@ description: Add LLM features to a Node.js backend with any OpenAI-compatible pr
 
 # AI Integration
 
-Tested templates live in the sibling `create-backend` skill at `../create-backend/templates/ai/`, already at their final paths:
+Tested templates live in the sibling `create-backend` skill in `../create-backend/templates/ai.md`: each file sits under a `## \`<path>\`` heading with its full content in the code block below it. Write them at those paths:
 
 ```
 src/shared/ai/ai.js                AIClient: chat, json, stream, embed
@@ -17,7 +17,7 @@ src/modules/assistant/             a complete AI module (see layout below)
 api/assistant.md                   its API doc
 ```
 
-The `ai` config block and `AI_*` env vars are in `../create-backend/templates/common/src/config/index.js` and `.env.example`. For an existing project, copy the overlay, merge that config block, add `openai`, mount `assistantRoutes`, and rename `assistant` to the feature.
+The `ai` config block and `AI_*` env vars are in `../create-backend/templates/common.md` (`src/config/index.js` and `.env.example`). For an existing project, copy the overlay, merge that config block, add `openai`, mount `assistantRoutes`, and rename `assistant` to the feature.
 
 ## AI module layout
 

@@ -60,18 +60,18 @@ These skills are deliberately strict. If you disagree with one, put your rule in
 skills/
   <skill>/SKILL.md
   create-backend/templates/
-    common/      app, server, config, shared/, health + auth modules, CLAUDE.md, api/ docs
-    mongodb/     Mongoose connection, User/Session models, auth service, Docker
-    postgres/    Prisma schema and config, auth service, Docker
-    ai/          AIClient, model pool, secret box, SSRF guard, assistant module
-    */examples/  a complete reference feature module for each database
+    common.md              app, server, config, shared/, health + auth modules, CLAUDE.md, api/ docs
+    mongodb.md             Mongoose connection, User/Session models, auth service, Docker
+    postgres.md            Prisma schema and config, auth service, Docker
+    ai.md                  AIClient, model pool, secret box, SSRF guard, assistant module
+    *-example.md           a complete reference feature module for each database
 ```
 
-Every template file is named exactly as it lands in the generated project, and both database variants are tested end to end (auth, refresh rotation and reuse detection, CRUD, tenant isolation, AI streaming with tools).
+Templates are Markdown bundles: every file sits under a heading with its exact path in the generated project and its full content in a code block, and both database variants are tested end to end (auth, refresh rotation and reuse detection, CRUD, tenant isolation, AI streaming with tools).
 
 ## Contributing
 
-Issues and pull requests are welcome. Keep templates lint-clean against `skills/create-backend/templates/common/eslint.config.js`, and keep each skill focused on one job.
+Issues and pull requests are welcome. Keep the JavaScript inside the template bundles lint-clean against the `eslint.config.js` in `common.md`, and keep each skill focused on one job.
 
 ## Built by
 

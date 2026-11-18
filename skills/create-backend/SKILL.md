@@ -6,20 +6,20 @@ argument-hint: "<what the product does> [using mongodb|postgres] [with ai]"
 
 # Create Backend
 
-The user describes **what** they are building. You decide **how** using this skill, and never invent product scope. Every file comes from `templates/` next to this file, already named exactly as it must be in the project. Copy, then adapt. Do not rewrite templates from memory.
+The user describes **what** they are building. You decide **how** using this skill, and never invent product scope. Every file comes from the Markdown bundles in `templates/` next to this file. Each bundle lists files under `## \`<path>\`` headings, each followed by one fenced code block holding the complete file. Write each block's content, byte for byte, to that path inside the project, then adapt. Do not rewrite templates from memory and do not skip files.
 
 ## Templates
 
-```
-templates/
-  common/      every project: app, server, config, shared/, health + auth modules, CLAUDE.md, api/ docs
-  mongodb/     MongoDB: config/databases.js, models/, auth service, package.json, Docker
-  postgres/    PostgreSQL: config/databases.js, prisma/, auth service, package.json, Docker
-  ai/          optional: shared/ai, shared/crypto, shared/network, modules/assistant (prompt/, tools/, evals/)
-  <db>/examples/   a complete reference feature module ("vendor") — a pattern to copy, never shipped as is
-```
+| Bundle | Files | Contents |
+|---|---|---|
+| `templates/common.md` | 33 | every project: app, server, config, shared/, health + auth modules, CLAUDE.md, README, api/ docs, ESLint, env |
+| `templates/mongodb.md` | 7 | MongoDB: config/databases.js, User + Session models, auth service, package.json, Docker |
+| `templates/postgres.md` | 8 | PostgreSQL: config/databases.js, prisma/schema.prisma, prisma.config.js, auth service, package.json, Docker, entrypoint |
+| `templates/ai.md` | 21 | optional: shared/ai, shared/crypto, shared/network, modules/assistant (prompt/, tools/, evals/), api/assistant.md |
+| `templates/mongodb-example.md` | 7 | reference feature module ("vendor") for MongoDB — a pattern, never shipped as is |
+| `templates/postgres-example.md` | 7 | reference feature module ("vendor") for PostgreSQL — a pattern, never shipped as is |
 
-A project = `common/` + one of `mongodb/` or `postgres/` (+ `ai/` when needed). The overlays add files; none of them collide with `common/`.
+A project = `common.md` + one of `mongodb.md` / `postgres.md` (+ `ai.md` when needed). No path appears in two bundles. Read a bundle fully before writing from it. The fence around each file can be longer than three backticks when the file itself contains code fences; the file content is everything between the opening and the matching closing fence.
 
 ## Phase 0 — Read first
 
@@ -29,9 +29,9 @@ A project = `common/` + one of `mongodb/` or `postgres/` (+ `ai/` when needed). 
 
 | Signal | Choice |
 |---|---|
-| "mongodb", "mongo", "mongoose", or document-shaped data | `mongodb/` |
-| "postgres", "sql", "prisma", or relational/reporting-heavy data | `postgres/` |
-| "ai", "llm", "chat", "assistant", "summarize", "agent" | add `ai/` |
+| "mongodb", "mongo", "mongoose", or document-shaped data | `mongodb.md` |
+| "postgres", "sql", "prisma", or relational/reporting-heavy data | `postgres.md` |
+| "ai", "llm", "chat", "assistant", "summarize", "agent" | add `ai.md` |
 
 If the database is genuinely unclear, ask once. Otherwise decide and say which.
 
@@ -61,12 +61,10 @@ Questions: <only ones that change schema or contract>
 
 ## Phase 2 — Assemble
 
-```bash
-cp -R <skill>/templates/common/. <project>/
-cp -R <skill>/templates/<db>/. <project>/
-rm -rf <project>/examples
-cp -R <skill>/templates/ai/. <project>/          # only with AI
-```
+1. Write every file from `templates/common.md`.
+2. Write every file from `templates/mongodb.md` or `templates/postgres.md`. For Postgres, `chmod +x docker-entrypoint.sh`.
+3. With AI only: write every file from `templates/ai.md`.
+4. Check the count: the files you wrote equal the bundle counts above (33 + 7, or 33 + 8, plus 21 with AI).
 
 Then replace every placeholder (`grep -rn "__[A-Z_]*__" <project>` must return nothing at the end):
 
@@ -82,7 +80,7 @@ Then replace every placeholder (`grep -rn "__[A-Z_]*__" <project>` must return n
 | `__EXTRA_COMMANDS__` | CLAUDE.md | Postgres: ` · npm run db:migrate · npm run db:generate`; add ` · npm run eval:assistant` with AI; else empty |
 | `__SETUP_EXTRA__` | README.md | Postgres: `npm run db:migrate` plus a newline; else empty |
 | `__SCRIPTS_EXTRA__` | README.md | Postgres rows for `db:migrate`, `db:generate`, `db:migrate:deploy`; AI row for `eval:assistant`; else empty |
-| `__DATABASE_ENV__` | .env.example | Mongo: `MONGODB_URI=mongodb://localhost:27017/<name>`; Postgres: `DATABASE_URL=postgresql://app:app@localhost:5432/app`, `DATABASE_READ_URL=`, `DATABASE_POOL_MAX=10` |
+| `__DATABASE_ENV__` | .env.example | Mongo: `MONGODB_URI=mongodb://localhost:27017/<name>`; Postgres: `POSTGRES_USER=app`, `POSTGRES_PASSWORD=YOUR_DB_PASSWORD`, `POSTGRES_DB=app`, `DATABASE_URL=postgresql://app:YOUR_DB_PASSWORD@localhost:5432/app`, `DATABASE_READ_URL=`, `DATABASE_POOL_MAX=10` |
 
 Clean up what does not apply:
 - `src/config/index.js`: delete the `mongo` block for Postgres, the `database` block for MongoDB.
@@ -113,9 +111,9 @@ Change the default `role` on `User` if self sign-up should not create an `OWNER`
 
 ## Phase 5 — Feature modules
 
-For each entity in the approved plan, copy `templates/<db>/examples/` and rename `vendor` / `Vendor` / `vendors` / `VENDOR` throughout:
+For each entity in the approved plan, take `templates/mongodb-example.md` or `templates/postgres-example.md`, write its files with `vendor` / `Vendor` / `vendors` / `VENDOR` renamed throughout:
 
-| From examples | To project |
+| From the example bundle | To project |
 |---|---|
 | `src/models/vendor.model.js` (Mongo) | `src/models/<name>.model.js` |
 | `prisma/vendor.prisma` (Postgres) | append to `prisma/schema.prisma`; add the back-relation (`<names> <Name>[]`) on `User` or the tenant; migrate |
@@ -125,7 +123,7 @@ For each entity in the approved plan, copy `templates/<db>/examples/` and rename
 
 Register each in `src/router/index.js`: `router.use('/<plural>', <name>Routes);`. Write `api/<name>.md` and add it to `api/README.md` (see `api-docs`).
 
-Every module has `controllers/`, `services/`, `routes/`, `validations/`, `index.js`. AI modules add `prompt/`, `tools/`, `evals/` like `modules/assistant`. A module with no input (health) has no `validations/`.
+Every module has `controllers/`, `services/`, `routes/`, `validations/`, `index.js`. AI modules add `prompt/`, `tools/`, `evals/` like `modules/assistant` in `templates/ai.md`. A module with no input (health) has no `validations/`.
 
 Apply `backend-conventions` to every file. Use `mongoose-mongodb` or `prisma-postgres` for queries and indexes.
 

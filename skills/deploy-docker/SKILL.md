@@ -57,10 +57,13 @@ With several API replicas, set `RUN_MIGRATIONS=true` on one release task only.
 services:
   postgres:
     image: postgres:17-alpine
-    environment: { POSTGRES_USER: app, POSTGRES_PASSWORD: app, POSTGRES_DB: app }
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-app}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Set POSTGRES_PASSWORD in .env}
+      POSTGRES_DB: ${POSTGRES_DB:-app}
     ports: ['5432:5432']
     volumes: [postgres-data:/var/lib/postgresql/data]
-    healthcheck: { test: ['CMD-SHELL', 'pg_isready -U app -d app'], interval: 10s, retries: 5 }
+    healthcheck: { test: ['CMD-SHELL', 'pg_isready -U $${POSTGRES_USER:-app} -d $${POSTGRES_DB:-app}'], interval: 10s, retries: 5 }
   mongo:
     image: mongo:8
     ports: ['27017:27017']

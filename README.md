@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="docs/banner.jpg" alt="Express Backend Skills for Claude Code" width="100%" />
+</p>
+
 # Express Backend Skills for Claude Code
 
 Opinionated, production-tested skills that teach Claude Code to build Node.js backends the same way every time: Express 5, ES Modules, MongoDB (Mongoose) or PostgreSQL (Prisma 7), Redis, Zod 4 and winston.

@@ -27,6 +27,7 @@ Route handlers replace controllers and routes. Services, validations and models 
 
 ```js
 import mongoose from 'mongoose';
+import config from '@/config/index.js';
 
 const cache = globalThis.mongooseCache || (globalThis.mongooseCache = { conn: null, promise: null });
 
@@ -34,9 +35,9 @@ const getMongoose = async () => {
   if (cache.conn) {
     return cache.conn;
   }
-  const uri = process.env.MONGODB_URI;
+  const { uri } = config.mongo;
   if (!uri) {
-    const error = new Error('MONGODB_URI is not set');
+    const error = new Error('The database connection is not configured');
     error.statusCode = 500;
     throw error;
   }
@@ -53,7 +54,7 @@ const getMongoose = async () => {
 export { getMongoose };
 ```
 
-Each service starts with `await getMongoose();`. For Prisma, keep a single client on `globalThis` in development the same way.
+`src/config/index.js` is the only module that reads environment variables; it exposes `config.mongo.uri`. Each service starts with `await getMongoose();`. For Prisma, keep a single client on `globalThis` in development the same way.
 
 ## Handler
 

@@ -39,7 +39,7 @@ JWT_EXPIRES_IN=15m
 JWT_REFRESH_EXPIRES_IN=7d
 
 AI_API_KEY=YOUR_AI_API_KEY
-AI_BASE_URL=https://api.openai.com/v1
+AI_BASE_URL=
 AI_MODEL=gpt-4o-mini
 AI_MODEL_POOL=
 AI_EMBEDDING_MODEL=text-embedding-3-small
@@ -560,7 +560,7 @@ const config = {
 
   ai: {
     apiKey: process.env.AI_API_KEY,
-    baseURL: process.env.AI_BASE_URL || 'https://api.openai.com/v1',
+    baseURL: process.env.AI_BASE_URL || undefined,
     model: process.env.AI_MODEL || 'gpt-4o-mini',
     modelPool: toList(process.env.AI_MODEL_POOL),
     embeddingModel: process.env.AI_EMBEDDING_MODEL || 'text-embedding-3-small',

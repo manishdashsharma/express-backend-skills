@@ -80,7 +80,7 @@ Then replace every placeholder (`grep -rn "__[A-Z_]*__" <project>` must return n
 | `__EXTRA_COMMANDS__` | CLAUDE.md | Postgres: ` · npm run db:migrate · npm run db:generate`; add ` · npm run eval:assistant` with AI; else empty |
 | `__SETUP_EXTRA__` | README.md | Postgres: `npm run db:migrate` plus a newline; else empty |
 | `__SCRIPTS_EXTRA__` | README.md | Postgres rows for `db:migrate`, `db:generate`, `db:migrate:deploy`; AI row for `eval:assistant`; else empty |
-| `__DATABASE_ENV__` | .env.example | Mongo: `MONGODB_URI=mongodb://localhost:27017/<name>`; Postgres: `POSTGRES_USER=app`, `POSTGRES_PASSWORD=YOUR_DB_PASSWORD`, `POSTGRES_DB=app`, `DATABASE_URL=postgresql://app:YOUR_DB_PASSWORD@localhost:5432/app`, `DATABASE_READ_URL=`, `DATABASE_POOL_MAX=10` |
+| `__DATABASE_ENV__` | .env.example | Mongo: `MONGODB_URI=mongodb://localhost:27017/<name>`; Postgres: `DATABASE_URL=postgresql://app:YOUR_DB_PASSWORD@localhost:5432/app`, `DATABASE_READ_URL=`, `DATABASE_POOL_MAX=10`. Tell the user to pick a real local password and set it in both `docker-compose.yml` (`POSTGRES_PASSWORD`) and `DATABASE_URL` |
 
 Clean up what does not apply:
 - `src/config/index.js`: delete the `mongo` block for Postgres, the `database` block for MongoDB.

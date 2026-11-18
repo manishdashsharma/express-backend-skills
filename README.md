@@ -69,6 +69,12 @@ Every template file is named exactly as it lands in the generated project, and b
 
 Issues and pull requests are welcome. Keep templates lint-clean against `skills/create-backend/templates/common/eslint.config.js`, and keep each skill focused on one job.
 
+## Built by
+
+**Manish Dash Sharma**, Senior Software Engineer, GenAI & Full-Stack Developer.
+
+🌐 [manishdashsharma.com](https://www.manishdashsharma.com/) · 🐙 [@manishdashsharma](https://github.com/manishdashsharma)
+
 ## License
 
-[MIT](LICENSE) © Manish Dash Sharma
+[MIT](LICENSE) © [Manish Dash Sharma](https://www.manishdashsharma.com/)

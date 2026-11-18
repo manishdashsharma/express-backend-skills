@@ -1,0 +1,13 @@
+{
+  "name": "express-backend",
+  "version": "1.0.0",
+  "description": "Production-grade Node.js backend skills: Express 5, ES Modules, Prisma/PostgreSQL, Mongoose/MongoDB, Redis, Zod. Module scaffolding, data-access rules, caching, auth sessions, security, jobs, docs and review.",
+  "author": {
+    "name": "Manish Dash Sharma",
+    "url": "https://github.com/manishdashsharma"
+  },
+  "homepage": "https://github.com/manishdashsharma/express-backend-skills",
+  "repository": "https://github.com/manishdashsharma/express-backend-skills",
+  "license": "MIT",
+  "keywords": ["express", "nodejs", "backend", "prisma", "postgresql", "mongoose", "mongodb", "redis", "zod", "api"]
+}

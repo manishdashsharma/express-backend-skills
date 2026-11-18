@@ -1,0 +1,23 @@
+{
+  "name": "backend-skills",
+  "owner": {
+    "name": "Manish Dash Sharma",
+    "url": "https://github.com/manishdashsharma"
+  },
+  "metadata": {
+    "description": "Opinionated, production-tested skills for building Node.js backends with Claude Code.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "express-backend",
+      "source": "./",
+      "description": "Express 5 + ES Modules backend skills: scaffolding, Prisma, Mongoose, Redis caching, auth sessions, security hardening, scheduled jobs, API docs and production review.",
+      "version": "1.0.0",
+      "author": { "name": "Manish Dash Sharma" },
+      "license": "MIT",
+      "category": "development",
+      "keywords": ["express", "nodejs", "backend", "prisma", "mongoose", "redis"]
+    }
+  ]
+}

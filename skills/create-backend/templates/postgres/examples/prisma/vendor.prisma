@@ -1,0 +1,21 @@
+enum VendorStatus {
+  ACTIVE
+  PAUSED
+}
+
+model Vendor {
+  id        String       @id @default(cuid())
+  ownerId   String
+  name      String       @db.VarChar(100)
+  phone     String?      @db.VarChar(20)
+  status    VendorStatus @default(ACTIVE)
+  isActive  Boolean      @default(true)
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  owner User @relation(fields: [ownerId], references: [id])
+
+  @@index([ownerId, isActive])
+  @@index([ownerId, isActive, createdAt])
+  @@map("vendors")
+}

@@ -2,7 +2,6 @@
   "name": "express-backend",
   "version": "1.0.0",
   "description": "Production-grade Node.js backend skills: Express 5, ES Modules, Prisma/PostgreSQL, Mongoose/MongoDB, Redis, Zod. Module scaffolding, data-access rules, caching, auth sessions, security, jobs, docs and review.",
-  "icon": ".claude-plugin/icon.png",
   "author": {
     "name": "Manish Dash Sharma",
     "url": "https://www.manishdashsharma.com/"

@@ -2,7 +2,7 @@
 
 Every generated project gets every file below, written at exactly the path in its heading.
 
-Files in this bundle: 33.
+Files in this bundle: 34.
 
 ## `.dockerignore`
 
@@ -750,6 +750,26 @@ const disconnectRedis = async () => {
 };
 
 export { getRedisClient, CacheManager, SessionManager, checkRedisHealth, disconnectRedis };
+```
+
+## `src/healthcheck.js`
+
+```js
+const port = process.env.PORT || 5000;
+const TIMEOUT_MS = 4000;
+
+const check = async () => {
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/v1/health`, {
+      signal: AbortSignal.timeout(TIMEOUT_MS),
+    });
+    process.exit(response.ok ? 0 : 1);
+  } catch {
+    process.exit(1);
+  }
+};
+
+check();
 ```
 
 ## `src/modules/auth/controllers/auth.controller.js`

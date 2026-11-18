@@ -43,7 +43,7 @@ Reference implementations: `../create-backend/templates/mongodb-example.md` and 
 ## 4. Verify
 
 - `npm run lint` (or the project's lint script) passes.
-- The module imports cleanly: `node -e "import('./src/router/index.js')"` with env set.
+- The app starts cleanly with `npm run dev` and the new routes are mounted.
 - If the server can run locally, hit each new route once and report real status codes. If it cannot, say so.
 - Re-read your diff for: comments, `console.log`, PUT/PATCH/DELETE, missing `isActive`, missing selection, double-wrapped `data`, unindexed filters.
 

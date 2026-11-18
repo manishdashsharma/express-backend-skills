@@ -45,17 +45,9 @@ Install only `openai`. It speaks to any OpenAI-compatible endpoint (OpenAI, Open
 
 ## Config
 
-```
-AI_API_KEY=                      shared/server key (optional if BYOK only)
-AI_BASE_URL=https://api.openai.com/v1
-AI_MODEL=gpt-4o-mini
-AI_MODEL_POOL=                   comma list for fallback, optional
-AI_EMBEDDING_MODEL=text-embedding-3-small
-AI_KEY_ENCRYPTION_SECRET=        64 hex chars (32 bytes), different per environment
-ALLOW_PRIVATE_AI_HOSTS=false     true only for self-hosted installs (Ollama on localhost)
-```
+The generated app reads its AI settings from its own `.env` through `src/config/index.js` (both in `../create-backend/templates/common.md`): provider base URL, default model, optional model pool, embedding model, the 32-byte key-encryption secret for stored user keys, and a switch that allows private hosts for self-hosted installs only. The plugin itself never reads or asks for any of these values.
 
-Generate the secret with `node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"`. Rotating it makes stored keys unreadable, so rotation is a re-encrypt script, never a swap.
+Generate the key-encryption secret with `openssl rand -hex 32`, separately per environment. Rotating it makes stored keys unreadable, so rotation is a re-encrypt script, never a swap.
 
 ## Using the client
 

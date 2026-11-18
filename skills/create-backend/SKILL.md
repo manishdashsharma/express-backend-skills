@@ -12,7 +12,7 @@ The user describes **what** they are building. You decide **how** using this ski
 
 | Bundle | Files | Contents |
 |---|---|---|
-| `templates/common.md` | 33 | every project: app, server, config, shared/, health + auth modules, CLAUDE.md, README, api/ docs, ESLint, env |
+| `templates/common.md` | 34 | every project: app, server, config, shared/, health + auth modules, CLAUDE.md, README, api/ docs, ESLint, env |
 | `templates/mongodb.md` | 7 | MongoDB: config/databases.js, User + Session models, auth service, package.json, Docker |
 | `templates/postgres.md` | 8 | PostgreSQL: config/databases.js, prisma/schema.prisma, prisma.config.js, auth service, package.json, Docker, entrypoint |
 | `templates/ai.md` | 21 | optional: shared/ai, shared/crypto, shared/network, modules/assistant (prompt/, tools/, evals/), api/assistant.md |
@@ -64,7 +64,7 @@ Questions: <only ones that change schema or contract>
 1. Write every file from `templates/common.md`.
 2. Write every file from `templates/mongodb.md` or `templates/postgres.md`. For Postgres, `chmod +x docker-entrypoint.sh`.
 3. With AI only: write every file from `templates/ai.md`.
-4. Check the count: the files you wrote equal the bundle counts above (33 + 7, or 33 + 8, plus 21 with AI).
+4. Check the count: the files you wrote equal the bundle counts above (34 + 7, or 34 + 8, plus 21 with AI).
 
 Then replace every placeholder (`grep -rn "__[A-Z_]*__" <project>` must return nothing at the end):
 

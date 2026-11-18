@@ -12,7 +12,7 @@ FROM node:22-alpine AS deps
 WORKDIR /app
 COPY package.json package-lock.json ./
 COPY prisma ./prisma
-RUN npm ci --omit=dev && npx prisma generate
+RUN npm ci --omit=dev --ignore-scripts && npm run db:generate
 
 FROM node:22-alpine AS runtime
 WORKDIR /app
@@ -28,7 +28,7 @@ RUN chmod +x /usr/local/bin/entrypoint.sh && chown -R app:app /app
 USER app
 EXPOSE 5000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
-  CMD node -e "fetch('http://127.0.0.1:'+(process.env.PORT||5000)+'/v1/health').then(r=>process.exit(r.ok?0:1)).catch(()=>process.exit(1))"
+  CMD ["node", "src/healthcheck.js"]
 ENTRYPOINT ["/sbin/tini", "--", "/usr/local/bin/entrypoint.sh"]
 CMD ["node", "src/server.js"]
 ```
@@ -36,6 +36,7 @@ CMD ["node", "src/server.js"]
 Mongoose projects drop the `prisma` lines. Drop `supercronic` and `cron` if there are no jobs. Add `python3 make g++` to the deps stage only if a native module (bcrypt) needs building.
 
 - `tini` as PID 1 forwards `SIGTERM` so graceful shutdown runs.
+- The health check runs `src/healthcheck.js` (shipped in the `create-backend` templates), a tiny file that requests `/v1/health` and exits 0 or 1. Keep probes as files in the image, not inline code.
 - Non-root user. No `.env` baked into the image; add a `.dockerignore` with `node_modules`, `.env*`, `logs`, `.git`, `coverage`.
 
 ## Entrypoint (Prisma)
